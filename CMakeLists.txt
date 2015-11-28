@@ -298,22 +298,24 @@ if(MSVC)
 	endif()
 endif()
 
-install(TARGETS yaml-cpp ${_INSTALL_DESTINATIONS})
+install(TARGETS yaml-cpp EXPORT yaml-cpp-targets ${_INSTALL_DESTINATIONS})
+
 install(
 	DIRECTORY ${header_directory}
 	DESTINATION ${INCLUDE_INSTALL_DIR}
 	FILES_MATCHING PATTERN "*.h"
 )
 
-export(
-    TARGETS yaml-cpp
-    FILE "${PROJECT_BINARY_DIR}/yaml-cpp-targets.cmake")
+#export(
+    #TARGETS yaml-cpp
+    #FILE "${PROJECT_BINARY_DIR}/yaml-cpp-targets.cmake")
 export(PACKAGE yaml-cpp)
-set(EXPORT_TARGETS yaml-cpp CACHE INTERNAL "export targets")
 
-set(CONFIG_INCLUDE_DIRS "${YAML_CPP_SOURCE_DIR}/include")
+set(CONFIG_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR}")
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config.cmake.in
 	"${PROJECT_BINARY_DIR}/yaml-cpp-config.cmake" @ONLY)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config-version.cmake.in
 	"${PROJECT_BINARY_DIR}/yaml-cpp-config-version.cmake" @ONLY)
 
@@ -323,6 +325,16 @@ if(UNIX)
 	install(FILES ${PC_FILE} DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
+install(
+	FILES
+	"${PROJECT_BINARY_DIR}/yaml-cpp-config.cmake" 
+	"${PROJECT_BINARY_DIR}/yaml-cpp-config-version.cmake" 
+	DESTINATION "${LIB_INSTALL_DIR}/cmake/yaml-cpp/"
+	)
+
+install(EXPORT yaml-cpp-targets 
+	DESTINATION "${LIB_INSTALL_DIR}/cmake/yaml-cpp/"
+	)
 
 ###
 ### Extras
