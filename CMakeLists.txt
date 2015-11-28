@@ -315,6 +315,7 @@ install(
     #TARGETS yaml-cpp
     #FILE "${PROJECT_BINARY_DIR}/yaml-cpp-targets.cmake")
 export(PACKAGE yaml-cpp)
+set(EXPORT_TARGETS yaml-cpp CACHE INTERNAL "export targets")
 
 set(CONFIG_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR}")
 
