@@ -261,7 +261,7 @@ endif()
 set(INCLUDE_INSTALL_ROOT_DIR include)
 
 set(INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_ROOT_DIR}/yaml-cpp)
-set(LIB_INSTALL_DIR "${_library_dir}${LIB_SUFFIX}")
+set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${_library_dir}${LIB_SUFFIX}")
 set(SHARE_INSTALL_DIR "${_share_dir}${LIB_SUFFIX}")
 
 set(_INSTALL_DESTINATIONS
@@ -303,7 +303,7 @@ if(MSVC)
 	endif()
 endif()
 
-install(TARGETS yaml-cpp ${_INSTALL_DESTINATIONS})
+install(TARGETS yaml-cpp EXPORT yaml-cpp-targets ${_INSTALL_DESTINATIONS})
 install(
 	DIRECTORY ${header_directory}
 	DESTINATION ${INCLUDE_INSTALL_DIR}
@@ -319,8 +319,21 @@ set(EXPORT_TARGETS yaml-cpp CACHE INTERNAL "export targets")
 set(CONFIG_INCLUDE_DIRS "${YAML_CPP_SOURCE_DIR}/include")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config.cmake.in
 	"${PROJECT_BINARY_DIR}/yaml-cpp-config.cmake" @ONLY)
+
+set(INSTALL_CMAKE_DIR ${LIB_INSTALL_DIR}/cmake/yaml-cpp)
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/include")
+set(CONFIG_INCLUDE_DIRS "\${OPENSURGSIM_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config.cmake.in
+	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/yaml-cpp-config.cmake" @ONLY)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config-version.cmake.in
 	"${PROJECT_BINARY_DIR}/yaml-cpp-config-version.cmake" @ONLY)
+
+install(FILES
+	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/yaml-cpp-config.cmake"
+	"${PROJECT_BINARY_DIR}/yaml-cpp-config-version.cmake"
+	DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install(EXPORT yaml-cpp-targets DESTINATION ${INSTALL_CMAKE_DIR})
 
 if(UNIX)
 	set(PC_FILE ${CMAKE_BINARY_DIR}/yaml-cpp.pc)
